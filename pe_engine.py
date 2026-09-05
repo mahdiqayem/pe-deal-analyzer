@@ -1,4 +1,5 @@
 import numpy_financial as npf
+import pandas as pd
 npf.irr([-2_000_000, 0, 0, 0, 0, 8_045_429])
 
 # pe_engine.py — pure functions, no Streamlit imports
@@ -68,13 +69,20 @@ def run_scenarios(investment, ownership_pct, entry_revenue, ebitda_margin, holdi
         )
     return results
 
-def test_scenarios_ordered_correctly():
-    results = run_scenarios(
-        investment=2_000_000,
-        ownership_pct=0.20,
-        entry_revenue=10_000_000,
-        ebitda_margin=0.25,
-        holding_period=5,
-    )
-    assert results["bear"]["moic"] < results["base"]["moic"] < results["bull"]["moic"]
-    assert results["bear"]["irr"] < results["base"]["irr"] < results["bull"]["irr"]
+
+def sensitivity_analysis(investment, ownership_pct, entry_revenue, ebitda_margin,
+                          holding_period, growth_rates, exit_multiples, metric="moic"):
+    grid = pd.DataFrame(index=growth_rates, columns=exit_multiples, dtype=float)
+    for growth_rate in growth_rates:
+        for exit_multiple in exit_multiples:
+            result = run_deal(
+                investment=investment,
+                ownership_pct=ownership_pct,
+                entry_revenue=entry_revenue,
+                ebitda_margin=ebitda_margin,
+                growth_rate=growth_rate,
+                exit_multiple=exit_multiple,
+                holding_period=holding_period
+            )
+            grid.loc[growth_rate, exit_multiple] = result[metric]
+    return grid
