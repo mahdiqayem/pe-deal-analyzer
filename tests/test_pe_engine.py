@@ -53,3 +53,19 @@ def test_sensitivity_analysis_shape_and_values():
         ebitda_margin=0.25, growth_rate=0.15, exit_multiple=8, holding_period=5,
     )["moic"]
     assert grid.loc[0.15, 8] == pytest.approx(expected)
+
+def test_run_deal_cash_flows():
+    investment = 1_000_000
+    result = run_deal(
+        investment=investment,
+        ownership_pct=0.5,
+        entry_revenue=5_000_000,
+        ebitda_margin=0.2,
+        growth_rate=0.15,
+        exit_multiple=8,
+        holding_period=5,
+    )
+
+    assert len(result["cash_flows"]) == 6
+    assert result["cash_flows"][0] == -investment
+    assert result["cash_flows"][-1] == result["proceeds"]

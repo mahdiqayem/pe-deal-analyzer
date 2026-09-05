@@ -1,8 +1,7 @@
+# pe_engine.py — pure functions, no Streamlit imports
+
 import numpy_financial as npf
 import pandas as pd
-npf.irr([-2_000_000, 0, 0, 0, 0, 8_045_429])
-
-# pe_engine.py — pure functions, no Streamlit imports
 
 def project_revenue(entry_revenue, growth_rate, years):
     revenues = [entry_revenue]
@@ -46,7 +45,8 @@ def run_deal(investment, ownership_pct, entry_revenue, ebitda_margin,
         "exit_value": exit_value,
         "proceeds": proceeds,
         "moic": moic(proceeds, investment),
-        "irr": irr(cash_flows)
+        "irr": irr(cash_flows),
+        "cash_flows": cash_flows,
     }
 
 SCENARIOS = {
