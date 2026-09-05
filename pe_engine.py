@@ -47,3 +47,34 @@ def run_deal(investment, ownership_pct, entry_revenue, ebitda_margin,
         "moic": moic(proceeds, investment),
         "irr": irr(cash_flows)
     }
+
+SCENARIOS = {
+    "bear": {"growth_rate": 0.05, "exit_multiple": 6},
+    "base": {"growth_rate": 0.15, "exit_multiple": 8},
+    "bull": {"growth_rate": 0.25, "exit_multiple": 10},
+}
+
+def run_scenarios(investment, ownership_pct, entry_revenue, ebitda_margin, holding_period):
+    results = {}
+    for scenario, assumptions in SCENARIOS.items():
+        results[scenario] = run_deal(
+            investment=investment,
+            ownership_pct=ownership_pct,
+            entry_revenue=entry_revenue,
+            ebitda_margin=ebitda_margin,
+            growth_rate=assumptions["growth_rate"],
+            exit_multiple=assumptions["exit_multiple"],
+            holding_period=holding_period,
+        )
+    return results
+
+def test_scenarios_ordered_correctly():
+    results = run_scenarios(
+        investment=2_000_000,
+        ownership_pct=0.20,
+        entry_revenue=10_000_000,
+        ebitda_margin=0.25,
+        holding_period=5,
+    )
+    assert results["bear"]["moic"] < results["base"]["moic"] < results["bull"]["moic"]
+    assert results["bear"]["irr"] < results["base"]["irr"] < results["bull"]["irr"]
