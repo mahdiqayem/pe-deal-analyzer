@@ -1,49 +1,62 @@
+<div align="center">
+
 # Private Equity Deal Analyzer
 
-A Python-based tool for analyzing private equity deals through deal-level returns, scenario modeling, sensitivity analysis, and cash flow visualization.
+**An interactive tool for modeling private equity returns — deal-level analysis, scenario comparison, and sensitivity testing in the browser.**
 
-## What It Does
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Plotly](https://img.shields.io/badge/Plotly-3F4F75?logo=plotly&logoColor=white)](https://plotly.com/)
+[![pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC?logo=pytest&logoColor=white)](https://pytest.org/)
 
-The Private Equity Deal Analyzer lets a user enter a set of deal assumptions and immediately see the potential investment returns. It calculates MOIC and IRR, compares Bear/Base/Bull scenarios, and shows how returns change under different growth and exit-multiple assumptions.
+[**Live Demo**](#) · [Features](#features) · [Methodology](#methodology) · [Architecture](#architecture) · [Run Locally](#running-locally)
 
-## Live Demo
+</div>
 
-**[Live Demo — coming soon](#)**
+---
 
-## Screenshot
+## Overview
 
-*Screenshot of the running Streamlit application coming soon.*
+Enter a set of deal assumptions — investment size, ownership stake, revenue, margins, growth, exit multiple, holding period — and immediately see the projected investment outcome.
+
+The analyzer calculates **MOIC** and **IRR**, compares **Bear / Base / Bull** scenarios side by side, and maps how returns shift across combinations of growth and exit-multiple assumptions.
+
+> **Screenshot coming soon** — a preview of the running application will be added here.
+
+---
 
 ## Features
 
-* **Single-deal analysis** — Calculate projected revenue, EBITDA, exit valuation, investor proceeds, MOIC, and IRR from a set of assumptions.
-* **Scenario modeling** — Compare Bear, Base, and Bull cases with different growth rates and exit multiples.
-* **Sensitivity analysis** — Evaluate how MOIC changes across combinations of growth rates and exit multiples, shown as both a table and a heatmap.
-* **Cash flow visualization** — Visualize the investment and exit proceeds across the holding period.
+| | Feature | What it does |
+|---|---|---|
+| **1** | **Single-deal analysis** | Projects revenue, EBITDA, exit valuation, investor proceeds, MOIC, and IRR from a set of assumptions |
+| **2** | **Scenario modeling** | Compares Bear, Base, and Bull cases across different growth rates and exit multiples |
+| **3** | **Sensitivity analysis** | Maps MOIC across a grid of growth-rate and exit-multiple combinations, as both a table and a heatmap |
+| **4** | **Cash flow visualization** | Charts the investment outflow and exit proceeds across the holding period |
+
+---
 
 ## Methodology
 
 ### MOIC vs IRR
 
-The analyzer uses both MOIC and IRR because they answer different questions about an investment.
+The analyzer reports both metrics because they answer different questions.
 
-**MOIC (Multiple on Invested Capital)** measures how many times the original investment is returned. A 2.5x MOIC means a $1 million investment generates $2.5 million of proceeds.
+**MOIC (Multiple on Invested Capital)** measures how many times the original investment is returned. A 2.5x MOIC means a \$1 million investment generates \$2.5 million of proceeds.
 
-**IRR (Internal Rate of Return)** measures the annualized return while taking the timing of cash flows into account. This matters because receiving $2.5 million after two years is materially different from receiving the same amount after seven years.
+**IRR (Internal Rate of Return)** measures the annualized return, accounting for the timing of cash flows. This matters because receiving \$2.5 million after two years is materially different from receiving the same amount after seven.
 
-MOIC tells you how much you made. IRR tells you how efficiently you made it. Using both provides a more complete view of investment performance.
+> **MOIC tells you how much you made. IRR tells you how efficiently you made it.**
 
 ### Exit Valuation
 
-The model estimates the company's exit value using an EBITDA exit multiple:
+Exit value is estimated using an EBITDA exit multiple:
 
 ```
 Exit Value = Exit EBITDA × Exit Multiple
 ```
 
-Revenue is projected forward using the assumed growth rate, and EBITDA is calculated using the assumed EBITDA margin.
-
-The investor's proceeds are then determined by applying their ownership percentage to the exit value:
+Revenue is projected forward at the assumed growth rate, and EBITDA is derived from the assumed margin. The investor's share of the exit is:
 
 ```
 Investor Proceeds = Exit Value × Ownership Percentage
@@ -53,127 +66,132 @@ These proceeds, together with the initial investment, form the cash flow series 
 
 ### Bear, Base, and Bull Cases
 
-The scenario model varies two assumptions:
+| Scenario | Growth Rate | Exit Multiple | Represents |
+| :------- | ----------: | ------------: | :--------- |
+| **Bear** | 5% | 6x | Weaker operating performance and a softer valuation environment |
+| **Base** | 15% | 8x | The central set of assumptions |
+| **Bull** | 25% | 10x | Stronger company performance and more favorable valuations |
 
-| Scenario | Growth Rate | Exit Multiple |
-| -------- | ----------: | ------------: |
-| **Bear** |          5% |            6x |
-| **Base** |         15% |            8x |
-| **Bull** |         25% |           10x |
-
-The **Base case** represents the central set of assumptions.
-
-The **Bear case** assumes slower business growth and a lower valuation multiple, representing a weaker operating and market environment.
-
-The **Bull case** assumes stronger growth and a higher valuation multiple, representing stronger company performance and more favorable valuation conditions.
-
-Changing both assumptions together is intentional: investment returns can be affected by both how the business performs and how much buyers are willing to pay for that performance.
+Both assumptions move together by design: investment returns are driven by **how the business performs** *and* **how much buyers are willing to pay for that performance**.
 
 ### Sensitivity Analysis
 
-The sensitivity grid shows how the deal's MOIC changes across different combinations of growth rates and exit multiples.
+The sensitivity grid shows how MOIC changes across combinations of growth rates and exit multiples — growth rates as rows, exit multiples as columns, with each cell holding the MOIC for that pairing.
 
-Growth rates form the rows, exit multiples form the columns. Each cell represents the MOIC produced by running the deal under that specific combination of assumptions.
+Rendered as a heatmap, it makes the shape of the return profile immediately visible: which assumptions move returns most, and where the deal stops being attractive.
 
-The heatmap makes it easier to identify which assumptions have the greatest effect on returns, and where the investment becomes more or less attractive.
+---
 
 ## Limitations & Assumptions
 
-This tool models a deal as a simplified, all-equity investment. The following are deliberate scope decisions for this version, not oversights — each one is a meaningful driver of returns in real transactions:
+This tool models a deal as a simplified, all-equity investment. The following are deliberate scope decisions for this version — each is a meaningful driver of returns in real transactions.
+
+<details>
+<summary><strong>What this model does not capture</strong></summary>
+
+<br>
 
 * **No leverage.** Private equity buyouts are typically financed partly with debt raised against the target company, and paying that debt down over the holding period is a major contributor to equity returns. This model assumes the investment is funded entirely with equity.
-* **No interim cash flows.** Dividends, distributions, and recapitalizations during the holding period are not modeled. All value is assumed to be realized at exit.
+* **No interim cash flows.** Dividends, distributions, and recapitalizations during the holding period are not modeled — all value is assumed to be realized at exit.
 * **No fees or carried interest.** Management fees, carry, and transaction costs are excluded, so returns are gross rather than net to a limited partner.
 * **Constant operating assumptions.** Revenue growth and EBITDA margin are held flat across the holding period rather than varying year by year.
-* **Single exit event.** The model assumes one clean exit at the end of the holding period, at the specified EBITDA multiple.
+* **Single exit event.** One clean exit at the end of the holding period, at the specified EBITDA multiple.
 
-A future version would add a debt schedule with interest and amortization, year-by-year operating assumptions, and a fee/carry layer to produce net returns.
+</details>
+
+**Planned for v2:** a debt schedule with interest and amortization, year-by-year operating assumptions, and a fee/carry layer to produce net returns.
+
+---
 
 ## Architecture
 
-The project separates the financial calculation engine from the user interface.
+The project separates the **calculation engine** from the **user interface**.
+
+```
+pe-deal-analyzer/
+├── pe_engine.py        # Pure calculation functions — no Streamlit imports
+├── app.py              # Streamlit UI — inputs, layout, charts
+├── tests/
+│   └── test_pe_engine.py
+├── requirements.txt
+└── README.md
+```
 
 ### `pe_engine.py`
 
-Contains the core financial calculations as pure Python functions, with zero Streamlit imports. The engine handles:
+Core financial logic as pure Python functions, with zero Streamlit imports:
 
-* Revenue projections
-* EBITDA projections
-* Exit valuation
-* Investor proceeds
-* MOIC
-* IRR
-* Scenario analysis
-* Sensitivity analysis
+`project_revenue` · `project_ebitda` · `exit_valuation` · `investor_proceeds` · `moic` · `irr` · `run_deal` · `run_scenarios` · `sensitivity_analysis`
 
-Keeping these calculations independent from the interface means the engine can be tested and reused independently of Streamlit.
+Because the engine has no dependency on the interface, it can be tested in isolation and reused by any front end — a notebook, a CLI, an API, or a different UI framework entirely.
 
 ### `app.py`
 
-Contains the Streamlit user interface. It handles:
+The Streamlit layer: user inputs and validation, deal results, scenario comparison, the sensitivity table and heatmap, and all charts. It calls the engine and renders the output — it contains no financial logic of its own.
 
-* User inputs and validation
-* Displaying deal results
-* Scenario comparison
-* Sensitivity table and heatmap
-* Charts and visualizations
-
-This separation keeps the project easier to test, maintain, and extend.
+---
 
 ## Tech Stack
 
-* **Python**
-* **pandas** — DataFrames and sensitivity analysis
-* **numpy-financial** — IRR calculation
-* **Streamlit** — Interactive web application
-* **Plotly** — Data visualization
-* **pytest** — Automated testing
+| Tool | Role |
+| :--- | :--- |
+| **Python** | Core language |
+| **pandas** | DataFrames and the sensitivity grid |
+| **numpy-financial** | IRR calculation |
+| **Streamlit** | Interactive web application |
+| **Plotly** | Charts and heatmap |
+| **pytest** | Automated testing |
+
+---
 
 ## Running Locally
 
-Clone the repository:
+**1. Clone the repository**
 
 ```bash
 git clone https://github.com/mahdiqayem/pe-deal-analyzer.git
 cd pe-deal-analyzer
 ```
 
-Create and activate a virtual environment:
+**2. Create and activate a virtual environment**
 
 ```bash
 python -m venv venv
-```
-
-On macOS/Linux:
-
-```bash
 source venv/bin/activate
 ```
 
-On Windows:
+<details>
+<summary>On Windows</summary>
+
+<br>
 
 ```bash
+python -m venv venv
 venv\Scripts\activate
 ```
 
-Install the dependencies:
+</details>
+
+**3. Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the application:
+**4. Run the app**
 
 ```bash
 streamlit run app.py
 ```
 
-## Testing
+The app opens at `http://localhost:8501`.
 
-Run the automated test suite with:
+---
+
+## Testing
 
 ```bash
 python -m pytest
 ```
 
-The tests verify the behavior of the core financial calculation functions and the outputs produced by `run_deal()`, including the cash flow series used by the application visualizations.
+The suite verifies the core financial calculations against hand-computed values, checks that scenario ordering behaves correctly (Bear < Base < Bull), validates the shape and values of the sensitivity grid, confirms that invalid inputs raise rather than fail silently, and checks the cash flow series that drives the visualizations.
